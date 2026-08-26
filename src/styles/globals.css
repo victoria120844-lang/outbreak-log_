@@ -1,0 +1,350 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   OUTBREAK LOG — design tokens
+   These are the only colors in the product. Do not introduce new ones.
+   ========================================================================== */
+
+:root {
+  --ash-900: #0b0d10; /* cold charcoal, blue-leaning — base background */
+  --ash-800: #14171c; /* panel background */
+  --ash-700: #1d2128; /* raised surface, input fields */
+  --oxblood: #2a1518; /* dried blood, gradients and borders only */
+  --blood: #8e1b21; /* primary accent — dried arterial */
+  /* Critical / death states ONLY. Lightened from #C8322B, which measured
+     3.38:1 on --ash-800 and failed WCAG AA as text; this reads 5.29:1 there
+     and 4.70:1 on --ash-700, the darkest surface it sits on. */
+  --blood-hot: #e85d52;
+  --bile: #6e7a3a; /* infection meter and infected states ONLY */
+  --bone: #d8d2c6; /* primary text, warm off-white */
+  --fog: #8a8f98; /* labels, secondary text, disabled */
+
+  /* Derived surfaces — still built from the tokens above. */
+  --page-bottom: #0f0a0c; /* terminal stop of the base gradient */
+  --panel-border: color-mix(in srgb, var(--oxblood) 70%, transparent);
+
+  /* Typography */
+  --font-display: 'Bebas Neue', 'Black Han Sans', 'Pretendard Variable',
+    sans-serif;
+  --font-body: 'Pretendard Variable', -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Pretendard Variable', ui-monospace, monospace;
+
+  /* Type scale: 11 / 13 / 15 / 20 / 28 / 44 */
+  --fs-11: 11px;
+  --fs-13: 13px;
+  --fs-15: 15px;
+  --fs-20: 20px;
+  --fs-28: 28px;
+  --fs-44: 44px;
+
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-15);
+  line-height: 1.6;
+  color: var(--bone);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  /* Layered background — never a flat black.
+     1) base vertical gradient  2) oxblood light bleeding in from above */
+  background-color: var(--ash-900);
+  background-image:
+    radial-gradient(
+      120% 70% at 50% -8%,
+      color-mix(in srgb, var(--oxblood) 18%, transparent) 0%,
+      color-mix(in srgb, var(--oxblood) 8%, transparent) 38%,
+      transparent 68%
+    ),
+    linear-gradient(180deg, var(--ash-900) 0%, var(--page-bottom) 100%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* 3) Film grain — inline SVG turbulence, fixed, never interactive. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23grain)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--blood) 55%, transparent);
+  color: var(--bone);
+}
+
+/* Never removed, only ever replaced with something at least as visible. */
+:focus-visible {
+  outline: 2px solid var(--blood);
+  outline-offset: 2px;
+}
+
+/* Announced to screen readers, invisible on screen. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ==========================================================================
+   Components
+   ========================================================================== */
+
+@layer components {
+  /* Panel: raised slab on ash-800 with a hairline oxblood border. */
+  .panel {
+    background-color: var(--ash-800);
+    border: 1px solid var(--panel-border);
+    border-radius: 2px;
+  }
+
+  /* Display type — headers, panel titles, big numbers. Used sparingly. */
+  .type-display {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    font-weight: 400;
+    line-height: 1.05;
+  }
+
+  /* Field labels — 11px, uppercase, wide tracking, fog. */
+  .type-label {
+    font-family: var(--font-body);
+    font-size: var(--fs-11);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fog);
+  }
+
+  /* 4px scrollbar: oxblood thumb on a transparent track. */
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--oxblood) transparent;
+  }
+
+  .scroll-thin::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .scroll-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background: var(--oxblood);
+  }
+
+  /* Trust slider: blood at the negative end, bone at the positive end.
+     Track colors need pseudo-elements, so this cannot be a utility. */
+  .trust-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 14px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .trust-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    background: linear-gradient(
+      90deg,
+      var(--blood) 0%,
+      var(--ash-700) 50%,
+      var(--bone) 100%
+    );
+  }
+
+  .trust-slider::-moz-range-track {
+    height: 4px;
+    background: linear-gradient(
+      90deg,
+      var(--blood) 0%,
+      var(--ash-700) 50%,
+      var(--bone) 100%
+    );
+  }
+
+  .trust-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 8px;
+    height: 14px;
+    margin-top: -5px;
+    border: 1px solid var(--ash-900);
+    border-radius: 0;
+    background: var(--bone);
+  }
+
+  .trust-slider::-moz-range-thumb {
+    width: 8px;
+    height: 14px;
+    border: 1px solid var(--ash-900);
+    border-radius: 0;
+    background: var(--bone);
+  }
+
+  .trust-slider:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  /* Survival log entries and every numeric stat. */
+  .type-data {
+    font-family: var(--font-mono);
+    font-size: var(--fs-13);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ==========================================================================
+   Opening sequence
+   One declarative timeline: every step is a keyframe animation with its own
+   delay, so nothing is chained in JavaScript and nothing runs per frame.
+   ========================================================================== */
+
+@keyframes intro-wordmark-in {
+  from {
+    opacity: 0;
+    letter-spacing: 0.4em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.02em;
+  }
+}
+
+/* The hit. One bright frame from the point of impact, then gone. */
+@keyframes shatter-flash {
+  0% {
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The whole pane jolts and settles. Transform only. */
+@keyframes shatter-shake {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  6% {
+    transform: translate3d(-9px, 5px, 0);
+  }
+  14% {
+    transform: translate3d(8px, -6px, 0);
+  }
+  24% {
+    transform: translate3d(-6px, -3px, 0);
+  }
+  36% {
+    transform: translate3d(5px, 4px, 0);
+  }
+  52% {
+    transform: translate3d(-3px, -2px, 0);
+  }
+  70% {
+    transform: translate3d(2px, 1px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* A fracture travels outward from the point it started. Scaling from the
+   impact is both the honest motion and the cheap one. */
+@keyframes shatter-grow {
+  from {
+    transform: scale(0.02);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes intro-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes intro-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Reduced motion: the wordmark holds, then the overlay leaves. */
+@keyframes intro-reduced {
+  0% {
+    opacity: 1;
+  }
+  57% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
