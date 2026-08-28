@@ -184,8 +184,8 @@ const deliver = (draft: Draft, carrier: Survivor, rng: Rng): void => {
 
   attachChanges(draft, entryIndex, diffStats(draft, before));
 
-  carrier.pregnantSince = undefined;
-  carrier.pregnantBy = undefined;
+   delete carrier.pregnantSince;
+   delete carrier.pregnantBy;
   carrier.pregnancyEndedDay = draft.day;
 };
 
@@ -207,8 +207,8 @@ const lose = (draft: Draft, carrier: Survivor, rng: Rng): void => {
     adjustStats(draft, survivor.id, shared);
   });
 
-  carrier.pregnantSince = undefined;
-  carrier.pregnantBy = undefined;
+  delete carrier.pregnantSince;
+  delete carrier.pregnantBy;
   // Same cooldown as a birth. Conceiving again the same evening a pregnancy
   // was lost is not a sentence this log should ever be able to write.
   carrier.pregnancyEndedDay = draft.day;
