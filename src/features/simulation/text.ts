@@ -54,7 +54,7 @@ export const chooseParticle = (word: string, particle: string): string => {
 };
 
 export type TemplateSlots = Partial<
-  Record<'생존자' | '상대' | '아이템' | '호칭', string>
+  Record<'생존자' | '상대' | '아이템' | '호칭', string | undefined>
 >;
 
 const SLOT_PATTERN =
