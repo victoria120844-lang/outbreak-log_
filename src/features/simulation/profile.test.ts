@@ -72,7 +72,7 @@ describe('buildProfile', () => {
 
   it('never returns a negative weight', () => {
     const profile = buildProfile(
-      makeSurvivor('a', 'A', { traits: ['timid', 'sickly', 'pessimistic'] }),
+      makeSurvivor('a', 'A', { traits: ['timid', 'insomniac', 'pessimistic'] }),
     );
     Object.values(profile).forEach((value) => {
       expect(value).toBeGreaterThanOrEqual(0);
