@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import type { SimState } from '@/types';
 import {
   SCHEMA_VERSION,
   clearPersistedState,
@@ -30,7 +31,7 @@ const survivor = {
   alive: true,
 };
 
-const sim = {
+const sim: SimState = {
   day: 3,
   phase: 'paused',
   tickMs: 2500,
