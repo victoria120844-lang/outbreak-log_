@@ -2,7 +2,7 @@ import type { StateCreator } from 'zustand';
 import { STARTER_SUPPLIES, getItem } from '@/data/items';
 import { clampStat } from '@/data/stats';
 import { chooseParticle } from '@/features/simulation';
-import type { InventoryEntry, StatKey } from '@/types';
+import type { InventoryEntry, LogEntry, StatKey } from '@/types';
 import { MAX_LOG_ENTRIES } from './logSlice';
 import {
   hasPersistedRun,
