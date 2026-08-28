@@ -72,7 +72,7 @@ export const createInventorySlice: StateCreator<
       inventory: additions.reduce(
         (entries, addition) =>
           mergeInto(entries, addition.itemId, addition.quantity),
-        state.inventory as readonly InventoryEntry[],
+        state.inventory,
       ),
     })),
 
@@ -128,7 +128,7 @@ export const createInventorySlice: StateCreator<
           severity: 'notable',
           message,
           actorIds: [survivorId],
-        },
+        } satisfies LogEntry,
       ].slice(-MAX_LOG_ENTRIES),
     });
   },
